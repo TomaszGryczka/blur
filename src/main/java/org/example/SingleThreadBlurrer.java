@@ -13,7 +13,7 @@ public class SingleThreadBlurrer {
     }
 
     public static void main(String[] args) {
-        String inputVideoPath = "input_cut.mp4";
+        String inputVideoPath = "input.mp4";
         String outputVideoPath = "output_single_thread.avi";
 
         VideoCapture videoCapture = new VideoCapture(inputVideoPath);
