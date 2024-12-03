@@ -40,7 +40,7 @@ public class VideoBlurrer {
         }
 
         ForkJoinPool pool = new ForkJoinPool();
-        int chunkSize = 500; // Liczba klatek na porcję
+        int chunkSize = 1600; // liczba klatek na porcję (jedną sekwencję)
         Mat frame = new Mat();
 
         while (true) {
@@ -60,19 +60,17 @@ public class VideoBlurrer {
             BlurFramesTask task = new BlurFramesTask(frames, 0, frames.size());
             List<Mat> blurredFrames = pool.invoke(task);
 
-            // Zapis przetworzonych klatek
+            // zapisujemy przetworzone klatki
             for (Mat blurredFrame : blurredFrames) {
                 videoWriter.write(blurredFrame);
                 blurredFrame.release();
             }
 
-            // Zwolnij pamięć klatek
             for (Mat originalFrame : frames) {
                 originalFrame.release();
             }
         }
 
-        // Zwolnienie zasobów
         videoCapture.release();
         videoWriter.release();
         pool.shutdown();
@@ -81,7 +79,7 @@ public class VideoBlurrer {
     }
 
     static class BlurFramesTask extends RecursiveTask<List<Mat>> {
-        private static final int THRESHOLD = 10; // Maksymalna liczba klatek do jednoczesnego przetwarzania
+        private static final int THRESHOLD = 200; // maksymalna liczba klatek do jednoczesnego przetwarzania
         private List<Mat> frames;
         private int start;
         private int end;
@@ -95,7 +93,6 @@ public class VideoBlurrer {
         @Override
         protected List<Mat> compute() {
             if (end - start <= THRESHOLD) {
-                // Przetwarzanie klatek w bieżącym zakresie
                 List<Mat> blurredFrames = new ArrayList<>();
                 for (int i = start; i < end; i++) {
                     Mat blurred = new Mat();
@@ -104,7 +101,6 @@ public class VideoBlurrer {
                 }
                 return blurredFrames;
             } else {
-                // Podział na mniejsze zadania
                 int mid = (start + end) / 2;
                 BlurFramesTask task1 = new BlurFramesTask(frames, start, mid);
                 BlurFramesTask task2 = new BlurFramesTask(frames, mid, end);

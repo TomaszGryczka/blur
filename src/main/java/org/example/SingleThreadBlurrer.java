@@ -37,7 +37,6 @@ public class SingleThreadBlurrer {
 
         while (videoCapture.read(frame)) {
             Mat blurredFrame = new Mat();
-            // Apply Gaussian blur
             Imgproc.GaussianBlur(frame, blurredFrame, new org.opencv.core.Size(15, 15), 0);
             videoWriter.write(blurredFrame);
         }
